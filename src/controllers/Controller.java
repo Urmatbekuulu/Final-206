@@ -15,6 +15,12 @@ import java.util.List;
 public class Controller {
     public Model model;
     public View view;
+    List<String> fileNames=model.filNames;
+    List<String> markerNames = model.markerNames;
+    List<Integer> points = model.points;
+
+    List<String> averageListName = new ArrayList<>();
+    List<Integer> averagePoint = new ArrayList<>();
 
     public  void execute(){
         this.model = new Model();
@@ -37,16 +43,41 @@ public class Controller {
     }
 
     private void analyzeActionPerformed() {
+        boolean hasAdded[] = new boolean[fileNames.size()];
+        for(int i=0;i<fileNames.size();i++){
+            hasAdded[i]=false;
+        }
+
+
+        for(int i=0;i<fileNames.size();i++){
+            int sum=0;
+            int count=0;
+            if(!hasAdded[i]) {
+                for (int j = 0; j < fileNames.size(); j++) {
+
+                    if(fileNames.get(i).equals( fileNames.get(j) )){
+                        sum+=points.get(j);
+                        count++;
+                        hasAdded[j]=true;
+
+                    }
+
+                }
+                hasAdded[i]=true;
+                averageListName.add(fileNames.get(i));
+                averagePoint.add(Math.round((float) sum/count));
+            }
+
+
+
+        }
+
+        for(int i=0;i<averageListName.size();i++){
+            System.out.println(averageListName.get(i)+" "+averagePoint.get(i));
+        }
     }
 
     private void readFromFileActionPerformed() {
-
-        List<String> fileNames=model.filNames;
-        List<String> markerNames = model.markerNames;
-        List<Integer> points = model.points;
-
-        List<String> averageListName = new ArrayList<>();
-        List<Integer> averagePoint = new ArrayList<>();
 
         try(FileInputStream fileInputStream = new FileInputStream("src/"+"input.txt"); // if you work with intelIj then
             // add this "src/" to file path FileInputStream("src/"+modelCountChars.getFilePath)
@@ -106,55 +137,10 @@ public class Controller {
             }
 
 
-
         }
         catch (IOException e) {
             e.printStackTrace();
         }
-
-
-        boolean hasAdded[] = new boolean[fileNames.size()];
-        for(int i=0;i<fileNames.size();i++){
-            hasAdded[i]=false;
-        }
-
-
-        for(int i=0;i<fileNames.size();i++){
-            int sum=0;
-            int count=0;
-            if(!hasAdded[i]) {
-                for (int j = 0; j < fileNames.size(); j++) {
-
-                    if(fileNames.get(i).equals( fileNames.get(j) )){
-                        sum+=points.get(j);
-                        count++;
-                        hasAdded[j]=true;
-
-                    }
-
-                }
-                hasAdded[i]=true;
-                averageListName.add(fileNames.get(i));
-                averagePoint.add(Math.round((float) sum/count));
-            }
-
-
-
-        }
-        BarChart barChart = new BarChart();
-        for(int i=0;i<averageListName.size();i++)
-        {
-            barChart.addHistogramColumn(averageListName.get(i),averagePoint.get(i));
-
-            System.out.println(averageListName.get(i)+" "+averagePoint.get(i));
-        }
-        barChart.setBounds(150,0,1000,550);
-        barChart.layoutHistogram();
-
-        view.add(barChart);
-
-
-
 
     }
 
